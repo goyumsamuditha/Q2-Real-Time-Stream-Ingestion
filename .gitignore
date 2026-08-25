@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+data/*.json
+data/*.csv
+!data/.gitkeep
+flink-job/flink-sql-connector-kafka-*.jar
