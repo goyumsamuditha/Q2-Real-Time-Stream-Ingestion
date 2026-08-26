@@ -4,13 +4,14 @@ from pyflink.common import Configuration
 
 os.environ['_JAVA_OPTIONS'] = "--add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED"
 
-
 def main():
     config = Configuration()
     config.set_integer("rest.port", 8082)
     
     env_settings = EnvironmentSettings.new_instance().in_streaming_mode().with_configuration(config).build()
     t_env = TableEnvironment.create(env_settings)
+    
+    t_env.get_config().set("table.exec.source.idle-timeout", "5000 ms")
     
     jar_abspath = os.path.abspath("flink-sql-connector-kafka-1.17.1.jar")
     jar_abspath_forward = jar_abspath.replace('\\', '/').replace(' ', '%20')    
@@ -21,7 +22,7 @@ def main():
     t_env.get_config().get_configuration().set_string("pipeline.jars", jar_uri)
     
     source_ddl = """
-    CREATE TABLE traffic_source (
+    CREATE TABLE IF NOT EXISTS traffic_source (
         event_id STRING,
         sensor_id STRING,
         count_date TIMESTAMP(3),
@@ -31,7 +32,7 @@ def main():
         'connector' = 'kafka',
         'topic' = 'traffic-telemetry',
         'properties.bootstrap.servers' = 'localhost:9092', 
-        'properties.group.id' = 'flink-traffic-group-assignment',
+        'properties.group.id' = 'flink-traffic-group-v99', 
         'format' = 'json',
         'scan.startup.mode' = 'earliest-offset'
     )
@@ -39,7 +40,7 @@ def main():
     t_env.execute_sql(source_ddl)
     
     sink_ddl = """
-    CREATE TABLE windowed_results (
+    CREATE TABLE IF NOT EXISTS windowed_results (
         sensor_id STRING,
         window_start TIMESTAMP(3),
         window_end TIMESTAMP(3),
@@ -52,6 +53,7 @@ def main():
     )
     """
     t_env.execute_sql(sink_ddl)
+
     
     query = """
     INSERT INTO windowed_results
