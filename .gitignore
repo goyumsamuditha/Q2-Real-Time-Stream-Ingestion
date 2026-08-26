@@ -6,3 +6,4 @@ data/*.json
 data/*.csv
 !data/.gitkeep
 flink-job/flink-sql-connector-kafka-*.jar
+flink-job/venv/
