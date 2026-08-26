@@ -5,6 +5,7 @@ from pyflink.common import Configuration
 os.environ['_JAVA_OPTIONS'] = "--add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED"
 
 def main():
+    """Main function to initialize and run the Flink job."""
     config = Configuration()
     config.set_integer("rest.port", 8082)
     
@@ -59,12 +60,12 @@ def main():
     INSERT INTO windowed_results
         SELECT
             sensor_id,
-            TUMBLE_START(count_date, INTERVAL '10' MINUTE) AS window_start,
-            TUMBLE_END(count_date, INTERVAL '10' MINUTE) AS window_end,
+            TUMBLE_START(count_date, INTERVAL '15' MINUTE) AS window_start,
+            TUMBLE_END(count_date, INTERVAL '15' MINUTE) AS window_end,
             SUM(turn_count) AS total_vehicles
         FROM traffic_source
         GROUP BY
-            TUMBLE(count_date, INTERVAL '10' MINUTE),
+            TUMBLE(count_date, INTERVAL '15' MINUTE),
             sensor_id
     """
     
