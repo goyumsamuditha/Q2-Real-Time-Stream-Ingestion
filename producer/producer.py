@@ -11,7 +11,11 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
 
-url = os.getenv('API_URL')
+url_base = os.getenv('API_URL')
+if not url_base:
+    raise ValueError("API_URL is not set in the .env file.")
+
+url = f"{url_base}?$limit=1000&$order=read_date DESC"
 kafka_bootstrap_servers = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'localhost:9092').split(',')
 topic_name = "traffic-telemetry"
 
@@ -71,7 +75,7 @@ def run_simulation():
             count = int(record.get('turn_count',1 ))
             
             try:
-                event_time_obj = datetime.fromisoformat(record.get('count_date'))
+                event_time_obj = datetime.now()
             except Exception:
                 event_time_obj = datetime.now()
             
