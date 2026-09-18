@@ -47,9 +47,12 @@ Due to how a tumbling window operates, the Flink job retains processed data in m
     │       requirements.txt
     │       traffic_processor.py
     │
+    ├───tests/
+    │       test_producer.py
+    │
     └───producer/
             producer.py
-            requirements_2.txt
+            requirements.txt
             test_producer.py
 
 ---
