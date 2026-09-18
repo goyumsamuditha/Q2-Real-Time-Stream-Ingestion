@@ -64,6 +64,9 @@ def main():
             TUMBLE_END(count_date, INTERVAL '15' MINUTE) AS window_end,
             SUM(turn_count) AS total_vehicles
         FROM traffic_source
+        WHERE sensor_id IS NOT NULL 
+          AND turn_count >= 0 
+          AND turn_count < 1000
         GROUP BY
             TUMBLE(count_date, INTERVAL '15' MINUTE),
             sensor_id
